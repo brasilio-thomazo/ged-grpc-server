@@ -7,12 +7,11 @@ ARG GID=1000
 FROM alpine:latest as base
 ARG GID
 ARG UID
-RUN addgroup -g ${GID} app \
-    && adduser -G app -u ${UID} -s /bin/bash -D app \
+RUN apk add --no-cache bash curl doas \
+    && addgroup -g ${GID} app \
+    && adduser -G wheel -u ${UID} -s /bin/bash -D app app \
     && mkdir -p /home/app/public_html \
     && chown app:app /home/app -R \
-    && apk add --no-cache bash curl doas \
-    && usermod -G wheel app \
     && echo 'permit nopass :wheel as root' >> /etc/doas.d/doas.conf
 
 ####################################################################################
@@ -20,10 +19,11 @@ RUN addgroup -g ${GID} app \
 #                                     SERVER                                       #
 ####################################################################################
 FROM base as build
-COPY . .
+COPY . /source
+WORKDIR /source
 RUN apk add --no-cache go \
     && go mod tidy \
-    && go build -v -o duat-server .
+    && go build -v -o hermes .
 
 ####################################################################################
 #                                      GRPC                                        #
@@ -40,7 +40,7 @@ ENV DB_PASSWORD=
 ENV DB_DATABASE=postgres
 ENV UPLOAD_IMAGE=/home/app/public_html/storage/app
 
-COPY --from=build /golang/duat-server /usr/local/bin/
+COPY --from=build /source/hermes /usr/local/bin/
 USER app
 WORKDIR /home/app/public_html/storage/app
-CMD [ "duat-server" ]
+CMD [ "hermes" ]
