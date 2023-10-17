@@ -20,7 +20,7 @@ client:
 	go run cmd/client/main.go
 
 docker-build:
-	docker build -t devoptimus/ged-client-protobuf --target=server .
+	docker build -t devoptimus/ged-grpc-server --target=server .
 
 docker-up: docker-down
 	docker compose up -d --build
