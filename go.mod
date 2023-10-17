@@ -3,6 +3,7 @@ module br.dev.optimus/hermes
 go 1.20
 
 require (
+	github.com/aws/aws-sdk-go v1.45.26
 	github.com/google/uuid v1.3.1
 	github.com/jinzhu/copier v0.4.0
 	google.golang.org/grpc v1.58.3
@@ -18,6 +19,7 @@ require (
 	github.com/jackc/pgx/v5 v5.4.3 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect
+	github.com/jmespath/go-jmespath v0.4.0 // indirect
 	golang.org/x/crypto v0.14.0 // indirect
 	golang.org/x/net v0.17.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect

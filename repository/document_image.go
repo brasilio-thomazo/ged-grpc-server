@@ -10,6 +10,9 @@ import (
 	"br.dev.optimus/hermes/model"
 	"br.dev.optimus/hermes/pb"
 	"br.dev.optimus/hermes/utils"
+	"github.com/aws/aws-sdk-go/aws"
+	"github.com/aws/aws-sdk-go/aws/session"
+	"github.com/aws/aws-sdk-go/service/s3"
 	"github.com/google/uuid"
 	"github.com/jinzhu/copier"
 	"google.golang.org/grpc/codes"
@@ -24,6 +27,8 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 	if err != nil {
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
+
+	disk := in.GetInfo().Disk
 
 	documentID, err := uuid.Parse(in.GetInfo().DocumentId)
 	if err != nil {
@@ -44,8 +49,17 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 		return status.Error(codes.Internal, err.Error())
 	}
 
-	uploadPath := fmt.Sprintf("%s/%s", os.Getenv("UPLOAD_IMAGE"), documentID)
-	file, err := utils.NewFile(fmt.Sprintf("%s%s", id.String(), in.GetInfo().Extension), uploadPath)
+	var uPath string
+	uDir := fmt.Sprintf("%s/%s", os.Getenv("APP_PATH"), documentID.String())
+	uFile := fmt.Sprintf("%s%s", id.String(), in.GetInfo().Extension)
+	uFilename := fmt.Sprintf("%s/%s", uDir, uFile)
+	if disk == "s3" {
+		uPath = "/tmp"
+	} else {
+		uPath = fmt.Sprintf("/home/app/public_html/storage/app/%s", uDir)
+	}
+
+	file, err := utils.NewFile(uFile, uPath)
 	if err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
@@ -56,8 +70,9 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 
 	image := &model.DocumentImage{
 		DocumentID: documentID,
-		Filename:   file.Filename,
-		Page:       in.GetInfo().Page,
+		Disk:       disk,
+		Filename:   uFilename,
+		Pages:      in.GetInfo().Pages,
 	}
 
 	for {
@@ -66,6 +81,12 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 			break
 		}
 		if _, err := writeData(file, in.GetContent()); err != nil {
+			return status.Error(codes.Internal, err.Error())
+		}
+	}
+
+	if disk == "s3" {
+		if err = uploadAwsS3(file.Filename, uFilename); err != nil {
 			return status.Error(codes.Internal, err.Error())
 		}
 	}
@@ -83,6 +104,7 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 	if err := stream.SendAndClose(reply); err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
+
 	return nil
 }
 
@@ -92,4 +114,27 @@ func writeData(file *utils.File, data []byte) (int, error) {
 		return 0, err
 	}
 	return write, nil
+}
+
+func uploadAwsS3(filename, s3key string) error {
+	sess, err := session.NewSession(&aws.Config{})
+	if err != nil {
+		return err
+	}
+
+	file, err := os.Open(filename)
+	if err != nil {
+		return err
+	}
+
+	svc := s3.New(sess)
+	obj := &s3.PutObjectInput{
+		Bucket: aws.String(os.Getenv("AWS_BUCKET")),
+		Key:    aws.String(s3key),
+		Body:   file,
+	}
+	if _, err = svc.PutObject(obj); err != nil {
+		return err
+	}
+	return nil
 }

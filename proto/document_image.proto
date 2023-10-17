@@ -22,8 +22,9 @@ message ListDocumentImage {
 
 message DocumentImageInfo {
   string document_id = 1;
-  uint32 page = 2;
-  string extension = 3;
+  string disk = 2;
+  uint32 pages = 3;
+  string extension = 4;
 }
 
 message DocumentImageRequest {
