@@ -10,7 +10,7 @@ package hermes;
 message DocumentImageReply {
   uint64 id = 1;
   string document_id = 2;
-  uint32 page = 3;
+  uint32 pages = 3;
   string filename = 4;
   uint64 created_at = 5;
   uint64 updated_at = 6;
