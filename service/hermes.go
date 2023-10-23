@@ -43,3 +43,21 @@ func (s *HermesService) DocumentList(ctx context.Context, in *pb.ListRequest) (*
 	}
 	return reply, nil
 }
+
+func (s *HermesService) DepartmentList(ctx context.Context, in *pb.ListRequest) (*pb.ListDepartment, error) {
+	log.Printf("receive Department::All\n")
+	reply, err := s.repository.DepartmentList(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return reply, nil
+}
+
+func (s *HermesService) DocumentTypeList(ctx context.Context, in *pb.ListRequest) (*pb.ListDocumentType, error) {
+	log.Printf("receive Department::All\n")
+	reply, err := s.repository.DocumentTypeList(ctx, in)
+	if err != nil {
+		return nil, err
+	}
+	return reply, nil
+}
