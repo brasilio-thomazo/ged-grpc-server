@@ -25,7 +25,7 @@ type HermesClient interface {
 	DocumentStore(ctx context.Context, in *DocumentRequest, opts ...grpc.CallOption) (*DocumentReply, error)
 	DocumentList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListDocument, error)
 	DepartmentStore(ctx context.Context, in *DepartmentRequest, opts ...grpc.CallOption) (*DepartmentReply, error)
-	DepartmentList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*DepartmentReply, error)
+	DepartmentList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListDepartment, error)
 	DocumentTypeStore(ctx context.Context, in *DocumentTypeRequest, opts ...grpc.CallOption) (*DocumentTypeReply, error)
 	DocumentTypeList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListDocumentType, error)
 	DocumentImageStore(ctx context.Context, opts ...grpc.CallOption) (Hermes_DocumentImageStoreClient, error)
@@ -66,8 +66,8 @@ func (c *hermesClient) DepartmentStore(ctx context.Context, in *DepartmentReques
 	return out, nil
 }
 
-func (c *hermesClient) DepartmentList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*DepartmentReply, error) {
-	out := new(DepartmentReply)
+func (c *hermesClient) DepartmentList(ctx context.Context, in *ListRequest, opts ...grpc.CallOption) (*ListDepartment, error) {
+	out := new(ListDepartment)
 	err := c.cc.Invoke(ctx, "/hermes.Hermes/DepartmentList", in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -134,7 +134,7 @@ type HermesServer interface {
 	DocumentStore(context.Context, *DocumentRequest) (*DocumentReply, error)
 	DocumentList(context.Context, *ListRequest) (*ListDocument, error)
 	DepartmentStore(context.Context, *DepartmentRequest) (*DepartmentReply, error)
-	DepartmentList(context.Context, *ListRequest) (*DepartmentReply, error)
+	DepartmentList(context.Context, *ListRequest) (*ListDepartment, error)
 	DocumentTypeStore(context.Context, *DocumentTypeRequest) (*DocumentTypeReply, error)
 	DocumentTypeList(context.Context, *ListRequest) (*ListDocumentType, error)
 	DocumentImageStore(Hermes_DocumentImageStoreServer) error
@@ -154,7 +154,7 @@ func (UnimplementedHermesServer) DocumentList(context.Context, *ListRequest) (*L
 func (UnimplementedHermesServer) DepartmentStore(context.Context, *DepartmentRequest) (*DepartmentReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DepartmentStore not implemented")
 }
-func (UnimplementedHermesServer) DepartmentList(context.Context, *ListRequest) (*DepartmentReply, error) {
+func (UnimplementedHermesServer) DepartmentList(context.Context, *ListRequest) (*ListDepartment, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DepartmentList not implemented")
 }
 func (UnimplementedHermesServer) DocumentTypeStore(context.Context, *DocumentTypeRequest) (*DocumentTypeReply, error) {

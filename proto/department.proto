@@ -2,6 +2,7 @@ syntax = "proto3";
 
 option java_multiple_files = true;
 option java_package = "br.dev.optimus.hermes.grpc";
+option csharp_namespace = "br.dev.optimus.hermes.grpc";
 option go_package = "hermes/pb";
 option objc_class_prefix = "HLW";
 

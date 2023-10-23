@@ -38,8 +38,7 @@ ENV DB_READER_PORT=5432
 ENV DB_USERNAME=postgres
 ENV DB_PASSWORD=
 ENV DB_DATABASE=postgres
-ENV UPLOAD_IMAGE=/home/app/public_html/storage/app
-
+ENV APP_PATH=
 COPY --from=build /source/hermes /usr/local/bin/
 USER app
 WORKDIR /home/app/public_html/storage/app
