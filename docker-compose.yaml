@@ -1,0 +1,128 @@
+version: "3.8"
+services:
+  #
+  # Cache service
+  #
+  redis:
+    image: redis:alpine
+    command: redis-server --appendonly yes
+  #
+  # Database services
+  #
+  db-writer:
+    image: devoptimus/postgres:latest
+    container_name: db-writer
+    env_file:
+      - database.conf
+      - admin.conf
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q"]
+      interval: 15s
+  db-reader:
+    image: devoptimus/postgres:latest
+    container_name: db-reader
+    env_file:
+      - database.conf
+      - admin.conf
+    environment:
+      - MASTER_SERVER=db-writer
+      - MASTER_PORT=5432
+      - SLOT_NAME=master
+    healthcheck:
+      test: ["CMD", "pg_isready", "-q"]
+      interval: 15s
+    depends_on:
+      db-writer:
+        condition: service_healthy
+  #
+  # Sidekiq service
+  #
+  adm-install:
+    image: devoptimus/ged-admin-cli:latest
+    env_file:
+      - admin.conf
+    command: ["php", "artisan", "app:install"]
+    depends_on:
+      db-writer:
+        condition: service_healthy
+      db-reader:
+        condition: service_healthy
+  #
+  # Web service
+  #
+  adm-fpm:
+    image: devoptimus/ged-admin-fpm:latest
+    container_name: adm-fpm
+    env_file:
+      - admin.conf
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9000"]
+      interval: 15s
+    depends_on:
+      db-writer:
+        condition: service_healthy
+      db-reader:
+        condition: service_healthy
+      adm-install:
+        condition: service_completed_successfully
+  adm-nginx:
+    image: devoptimus/ged-admin-nginx:latest
+    container_name: adm-nginx
+    environment:
+      - FPM_HOST=adm-fpm:9000
+    depends_on:
+      adm-fpm:
+        condition: service_healthy
+    ports:
+      - "8000:80"
+  #
+  # client service
+  #
+  client-cli:
+    image: devoptimus/ged-client-cli:latest
+    command: ["php", "artisan", "app:install"]
+    env_file:
+      - client.conf
+    depends_on:
+      db-writer:
+        condition: service_healthy
+      db-reader:
+        condition: service_healthy
+  client-fpm:
+    image: devoptimus/ged-client-fpm:latest
+    container_name: client-fpm
+    env_file:
+      - client.conf
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "9000"]
+      interval: 15s
+    depends_on:
+      client-cli:
+        condition: service_completed_successfully
+  grpc-server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: server
+    image: devoptimus/ged-grpc-server:latest
+    container_name: grpc-server
+    env_file:
+      - client.conf
+    healthcheck:
+      test: ["CMD", "nc", "-z", "localhost", "50051"]
+      interval: 15s
+    depends_on:
+      client-cli:
+        condition: service_completed_successfully
+    ports:
+      - "50051:50051"
+  client-nginx:
+    image: devoptimus/ged-client-nginx:latest
+    container_name: client-nginx
+    environment:
+      - FPM_HOST=client-fpm:9000
+    depends_on:
+      client-fpm:
+        condition: service_healthy
+    ports:
+      - "8001:80"

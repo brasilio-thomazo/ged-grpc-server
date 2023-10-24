@@ -49,13 +49,13 @@ func (r *HermesRepositoryDB) DocumentStore(ctx context.Context, in *pb.DocumentR
 }
 
 func (r *HermesRepositoryDB) DocumentList(ctx context.Context, in *pb.ListRequest) (*pb.ListDocument, error) {
-	departmentDAO := dao.NewDepartmentDAO(r.Reader, r.Writer)
-	list, err := departmentDAO.GetAll(ctx)
+	var reply []*pb.DocumentReply
+	documentDAO := dao.NewDocumentDAO(r.Reader, r.Writer)
+	list, err := documentDAO.GetAll(ctx)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	reply := []*pb.DocumentReply{}
-	if err := copier.Copy(reply, &list); err != nil {
+	if err := copier.Copy(&reply, list); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.ListDocument{List: reply}, nil

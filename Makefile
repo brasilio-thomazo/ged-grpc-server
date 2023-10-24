@@ -19,6 +19,9 @@ build:
 docker-build:
 	docker build -t devoptimus/ged-grpc-server --target=server .
 
+docker-push:
+	docker push devoptimus/ged-grpc-server
+
 docker-up: docker-down
 	docker compose up -d --build
 

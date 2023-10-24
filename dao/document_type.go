@@ -42,11 +42,11 @@ func (r *DocumentTypeDAO) FindByName(ctx context.Context, name string) (*model.D
 	return data, nil
 }
 
-func (r *DocumentTypeDAO) GetAll(ctx context.Context) ([]model.DocumentType, error) {
-	data := []model.DocumentType{}
-	result := r.reader.WithContext(ctx).Find(&data)
+func (r *DocumentTypeDAO) GetAll(ctx context.Context) ([]*model.DocumentType, error) {
+	var list []*model.DocumentType
+	result := r.reader.WithContext(ctx).Find(&list)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return data, nil
+	return list, nil
 }

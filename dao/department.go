@@ -42,11 +42,11 @@ func (r *DepartmentDAO) Store(ctx context.Context, data *model.Department) (*mod
 	return data, nil
 }
 
-func (r *DepartmentDAO) GetAll(ctx context.Context) ([]model.Department, error) {
-	data := []model.Department{}
-	result := r.reader.WithContext(ctx).Find(&data)
+func (r *DepartmentDAO) GetAll(ctx context.Context) ([]*model.Department, error) {
+	var list []*model.Department
+	result := r.reader.WithContext(ctx).Find(&list)
 	if result.Error != nil {
 		return nil, result.Error
 	}
-	return data, nil
+	return list, nil
 }

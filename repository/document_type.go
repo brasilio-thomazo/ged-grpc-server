@@ -35,14 +35,13 @@ func (r *HermesRepositoryDB) DocumentTypeStore(ctx context.Context, in *pb.Docum
 }
 
 func (r *HermesRepositoryDB) DocumentTypeList(ctx context.Context, in *pb.ListRequest) (*pb.ListDocumentType, error) {
+	var reply []*pb.DocumentTypeReply
 	documentTypeDAO := dao.NewDocumentTypeDAO(r.Reader, r.Writer)
-
 	list, err := documentTypeDAO.GetAll(ctx)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	reply := []*pb.DocumentTypeReply{}
-	if err := copier.Copy(reply, &list); err != nil {
+	if err := copier.Copy(&reply, list); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.ListDocumentType{List: reply}, nil

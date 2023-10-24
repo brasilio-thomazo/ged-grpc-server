@@ -2,6 +2,7 @@ package repository
 
 import (
 	"context"
+	"log"
 
 	"br.dev.optimus/hermes/dao"
 	"br.dev.optimus/hermes/model"
@@ -35,13 +36,14 @@ func (r *HermesRepositoryDB) DepartmentStore(ctx context.Context, in *pb.Departm
 }
 
 func (r *HermesRepositoryDB) DepartmentList(ctx context.Context, in *pb.ListRequest) (*pb.ListDepartment, error) {
+	var reply []*pb.DepartmentReply
 	departmentDAO := dao.NewDepartmentDAO(r.Reader, r.Writer)
 	list, err := departmentDAO.GetAll(ctx)
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	reply := []*pb.DepartmentReply{}
-	if err := copier.Copy(reply, &list); err != nil {
+	log.Print(list)
+	if err := copier.Copy(&reply, list); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
 	return &pb.ListDepartment{List: reply}, nil

@@ -33,3 +33,12 @@ func (r *DocumentDAO) Store(ctx context.Context, data *model.Document) (*model.D
 	}
 	return data, nil
 }
+
+func (r *DocumentDAO) GetAll(ctx context.Context) ([]*model.Document, error) {
+	var list []*model.Document
+	result := r.reader.WithContext(ctx).Find(&list)
+	if result.Error != nil {
+		return nil, result.Error
+	}
+	return list, nil
+}
