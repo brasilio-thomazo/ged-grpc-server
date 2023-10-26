@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"log"
 	"os"
 
 	"br.dev.optimus/hermes/dao"
@@ -28,8 +29,6 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 		return status.Error(codes.InvalidArgument, err.Error())
 	}
 
-	disk := in.GetInfo().Disk
-
 	documentID, err := uuid.Parse(in.GetInfo().DocumentId)
 	if err != nil {
 		return status.Error(codes.InvalidArgument, err.Error())
@@ -38,6 +37,8 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 	if _, err := documentDAO.FindById(ctx, documentID); err != nil {
 		return status.Error(codes.InvalidArgument, "document id not exists")
 	}
+
+	disk := in.GetInfo().Disk
 
 	data := &model.DocumentImage{}
 	if err := copier.Copy(data, in); err != nil {
@@ -67,6 +68,8 @@ func (r *HermesRepositoryDB) DocumentImageStore(ctx context.Context, stream pb.H
 	if err := file.Create(); err != nil {
 		return status.Error(codes.Internal, err.Error())
 	}
+
+	log.Printf("create file [%s] [%s]", disk, file.Filename)
 
 	image := &model.DocumentImage{
 		DocumentID: documentID,

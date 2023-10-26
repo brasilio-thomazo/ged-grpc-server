@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"log"
 
 	"br.dev.optimus/hermes/dao"
 	"br.dev.optimus/hermes/model"
@@ -42,7 +41,6 @@ func (r *HermesRepositoryDB) DepartmentList(ctx context.Context, in *pb.ListRequ
 	if err != nil {
 		return nil, status.Error(codes.InvalidArgument, err.Error())
 	}
-	log.Print(list)
 	if err := copier.Copy(&reply, list); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
