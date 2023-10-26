@@ -16,7 +16,7 @@ message DepartmentReply {
 }
 
 message ListDepartment {
-    repeated DepartmentReply list = 1;
+    repeated DepartmentReply data = 1;
 }
 
 message DepartmentRequest{

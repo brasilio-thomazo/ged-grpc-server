@@ -16,7 +16,7 @@ message DocumentTypeReply {
 }
 
 message ListDocumentType {
-    repeated DocumentTypeReply list = 1;
+    repeated DocumentTypeReply data = 1;
 }
 
 message DocumentTypeRequest {

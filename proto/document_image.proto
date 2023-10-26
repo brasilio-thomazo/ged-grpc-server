@@ -18,7 +18,7 @@ message DocumentImageReply {
 }
 
 message ListDocumentImage {
-  repeated DocumentImageReply list = 1;
+  repeated DocumentImageReply data = 1;
 }
 
 message DocumentImageInfo {

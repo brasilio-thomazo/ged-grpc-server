@@ -44,5 +44,5 @@ func (r *HermesRepositoryDB) DocumentTypeList(ctx context.Context, in *pb.ListRe
 	if err := copier.Copy(&reply, list); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &pb.ListDocumentType{List: reply}, nil
+	return &pb.ListDocumentType{Data: reply}, nil
 }

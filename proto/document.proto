@@ -23,7 +23,7 @@ message DocumentReply {
 }
 
 message ListDocument {
-  repeated DocumentReply list = 1;
+  repeated DocumentReply data = 1;
 }
 
 message DocumentRequest {

@@ -46,5 +46,5 @@ func (r *HermesRepositoryDB) DepartmentList(ctx context.Context, in *pb.ListRequ
 	if err := copier.Copy(&reply, list); err != nil {
 		return nil, status.Error(codes.Internal, err.Error())
 	}
-	return &pb.ListDepartment{List: reply}, nil
+	return &pb.ListDepartment{Data: reply}, nil
 }
