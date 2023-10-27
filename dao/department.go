@@ -44,7 +44,7 @@ func (r *DepartmentDAO) Store(ctx context.Context, data *model.Department) (*mod
 
 func (r *DepartmentDAO) GetAll(ctx context.Context) ([]*model.Department, error) {
 	var list []*model.Department
-	result := r.reader.WithContext(ctx).Find(&list)
+	result := r.reader.WithContext(ctx).Where("name != ?", "System").Find(&list)
 	if result.Error != nil {
 		return nil, result.Error
 	}

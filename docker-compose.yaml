@@ -91,6 +91,8 @@ services:
   client-fpm:
     image: devoptimus/ged-client-fpm:latest
     container_name: client-fpm
+    volumes:
+      - ./storage:/home/app/public_html/storage/app
     env_file:
       - client.conf
     healthcheck:
@@ -106,6 +108,8 @@ services:
       target: server
     image: devoptimus/ged-grpc-server:latest
     container_name: grpc-server
+    volumes:
+      - ./storage:/home/app/public_html/storage/app
     env_file:
       - client.conf
     healthcheck:
